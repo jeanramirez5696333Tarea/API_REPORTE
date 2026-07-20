@@ -57,7 +57,9 @@ export const crearReporte = async (req, res) => {
     const deptoFormateado = (id_departamento === '' || !id_departamento || id_departamento === 'null') ? null : Number(id_departamento);
 
     // Ruta de la imagen
-    const url_imagen = req.file ? `/uploads/${req.file.filename}` : '/uploads/default.png';
+    const url_imagen = req.file
+      ? (req.file.path || req.file.secure_url || `/uploads/${req.file.filename}`)
+      : '/uploads/default.png';
 
     const query = `
       INSERT INTO reportes (id_usuario, id_categoria, id_estado, id_departamento, descripcion, latitud, longitud, url_imagen) 
