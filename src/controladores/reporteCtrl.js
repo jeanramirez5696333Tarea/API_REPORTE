@@ -39,8 +39,17 @@ export const getReportes = async (req, res) => {
 // 🌟 2. POST: Crear un nuevo reporte desde el celular
 export const crearReporte = async (req, res) => {
   try {
-    // Extraer campos de req.body
-    let { id_usuario, id_categoria, id_estado, id_departamento, descripcion, latitud, longitud, url_imagen } = req.body;
+    // Extraer campos de req.body de forma segura
+    const {
+      id_usuario,
+      id_categoria,
+      id_estado,
+      id_departamento,
+      descripcion,
+      latitud,
+      longitud,
+      url_imagen = ''
+    } = req.body || {};
 
     // Validación de presencia antes de transformar
     if (!id_usuario || !id_categoria || !descripcion || !latitud || !longitud) {
@@ -55,13 +64,13 @@ export const crearReporte = async (req, res) => {
     const categoriaId = Number(id_categoria);
     const estadoFormateado = id_estado ? Number(id_estado) : 1;
     const deptoFormateado = (id_departamento === '' || !id_departamento || id_departamento === 'null') ? null : Number(id_departamento);
-    let urlImagenFinal = '/uploads/default.png';
 
-    if (url_imagen && url_imagen !== '' && url_imagen !== 'undefined') {
-        urlImagenFinal = url_imagen;
-    } else if (req.file) {
-        urlImagenFinal = `/uploads/${req.file.filename}`;
-    }
+    const urlImagenFinal = (
+      url_imagen && url_imagen !== 'undefined' && url_imagen !== ''
+        ? url_imagen
+        : req.file?.path || req.file?.secure_url || '/uploads/default.png'
+    );
+
     const query = `
       INSERT INTO reportes (id_usuario, id_categoria, id_estado, id_departamento, descripcion, latitud, longitud, url_imagen) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
