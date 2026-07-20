@@ -1,21 +1,23 @@
 import { conmysql } from "../db.js";
 
 export const registrarSolucion = async (req, res) => {
-    // 1. Obtenemos los datos del body y el archivo de req.file
-    const { id_reporte, id_usuario_cambio, comentario } = req.body;
+    // 1. Extraemos la URL si viene desde el body (Cloudinary) 
+    // o el archivo si todavía usaras Multer
+    const { id_reporte, id_usuario_cambio, comentario, url_imagen } = req.body;
     
-    // Si multer procesó el archivo, req.file.filename tendrá el nombre generado
-    const url_imagen = req.file ? `/uploads/${req.file.filename}` : null;
+    // Lógica inteligente: 
+    // Si viene url_imagen en el body, usamos esa. 
+    // Si no, verificamos si existe un archivo físico (legacy).
+    const urlImagenFinal = url_imagen || (req.file ? `/uploads/${req.file.filename}` : null);
 
     try {
-        // 2. Insertar en el historial usando la variable 'url_imagen'
         const queryHistorial = `
             INSERT INTO historial_reportes (id_reporte, id_usuario_cambio, comentario, url_imagen_evidencia) 
             VALUES (?, ?, ?, ?)
         `;
-        await conmysql.query(queryHistorial, [id_reporte, id_usuario_cambio, comentario, url_imagen]);
+        // Usamos urlImagenFinal en lugar de la variable antigua
+        await conmysql.query(queryHistorial, [id_reporte, id_usuario_cambio, comentario, urlImagenFinal]);
 
-        // 3. Actualizar el estado en la tabla reportes
         const queryUpdate = "UPDATE reportes SET id_estado = 4 WHERE id = ?";
         await conmysql.query(queryUpdate, [id_reporte]);
 
