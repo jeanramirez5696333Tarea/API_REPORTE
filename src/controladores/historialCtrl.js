@@ -9,7 +9,7 @@ export const registrarSolucion = async (req, res) => {
         url_imagen = ''
     } = req.body || {};
 
-    const archivoSubido = req.files?.file?.[0] || req.files?.url_imagen?.[0] || req.file;
+    const archivoSubido = req.files?.[0] || req.file;
 
     // 2. Resolver la URL final con prioridad a la enviada por el cliente
     const urlImagenFinal = (

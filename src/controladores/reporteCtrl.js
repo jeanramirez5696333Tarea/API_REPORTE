@@ -51,6 +51,8 @@ export const crearReporte = async (req, res) => {
       url_imagen = ''
     } = req.body || {};
 
+    const archivoSubido = req.files?.[0] || req.file;
+
     // Validación de presencia antes de transformar
     if (!id_usuario || !id_categoria || !descripcion || !latitud || !longitud) {
       return res.status(400).json({ 
@@ -68,7 +70,7 @@ export const crearReporte = async (req, res) => {
     const urlImagenFinal = (
       url_imagen && url_imagen !== 'undefined' && url_imagen !== ''
         ? url_imagen
-        : req.file?.path || req.file?.secure_url || '/uploads/default.png'
+        : archivoSubido?.path || archivoSubido?.secure_url || '/uploads/default.png'
     );
 
     const query = `
