@@ -40,7 +40,7 @@ export const getReportes = async (req, res) => {
 export const crearReporte = async (req, res) => {
   try {
     // Extraer campos de req.body
-    let { id_usuario, id_categoria, id_estado, id_departamento, descripcion, latitud, longitud } = req.body;
+    let { id_usuario, id_categoria, id_estado, id_departamento, descripcion, latitud, longitud, url_imagen } = req.body;
 
     // Validación de presencia antes de transformar
     if (!id_usuario || !id_categoria || !descripcion || !latitud || !longitud) {
@@ -56,12 +56,10 @@ export const crearReporte = async (req, res) => {
     const estadoFormateado = id_estado ? Number(id_estado) : 1;
     const deptoFormateado = (id_departamento === '' || !id_departamento || id_departamento === 'null') ? null : Number(id_departamento);
     let urlImagenFinal = '/uploads/default.png';
-    // Ruta de la imagen
+
     if (url_imagen && url_imagen !== '' && url_imagen !== 'undefined') {
         urlImagenFinal = url_imagen;
-    } 
-    // 2. Si no viene URL, ¿se subió un archivo local mediante multer?
-    else if (req.file) {
+    } else if (req.file) {
         urlImagenFinal = `/uploads/${req.file.filename}`;
     }
     const query = `
@@ -78,7 +76,7 @@ export const crearReporte = async (req, res) => {
       descripcion, 
       latitud, 
       longitud, 
-      url_imagen 
+      urlImagenFinal
     ]);
 
     res.status(201).json({
