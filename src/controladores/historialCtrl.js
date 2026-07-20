@@ -1,24 +1,20 @@
 import { conmysql } from "../db.js";
 
 export const registrarSolucion = async (req, res) => {
-    // Agregamos logs para debugear qué recibe exactamente el servidor
-    console.log("--- DEBUG REGISTRAR SOLUCIÓN ---");
-    console.log("Cuerpo (req.body):", req.body);
-    console.log("Archivo (req.file):", req.file);
+    // 1. Extraemos los datos de forma segura
+    const {
+        id_reporte,
+        id_usuario_cambio,
+        comentario,
+        url_imagen = ''
+    } = req.body || {};
 
-    // 1. Extraemos los datos
-    const { id_reporte, id_usuario_cambio, comentario, url_imagen } = req.body;
-    
-    // 2. Lógica de prioridad:
-    // Si viene url_imagen desde Cloudinary (vía FormData), esa es la absoluta.
-    // Solo si es nula o undefined, revisamos si hay un archivo físico.
-    let urlImagenFinal = url_imagen || null;
-
-    if (!urlImagenFinal && req.file) {
-        urlImagenFinal = `/uploads/${req.file.filename}`;
-    }
-
-    console.log("URL final a guardar en BD:", urlImagenFinal);
+    // 2. Resolver la URL final con prioridad a la enviada por el cliente
+    const urlImagenFinal = (
+        url_imagen && url_imagen !== 'undefined' && url_imagen !== ''
+            ? url_imagen
+            : req.file?.path || req.file?.secure_url || null
+    );
 
     try {
         // 3. Insertar en el historial
