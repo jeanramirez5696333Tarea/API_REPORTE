@@ -9,11 +9,13 @@ export const registrarSolucion = async (req, res) => {
         url_imagen = ''
     } = req.body || {};
 
+    const archivoSubido = req.files?.file?.[0] || req.files?.url_imagen?.[0] || req.file;
+
     // 2. Resolver la URL final con prioridad a la enviada por el cliente
     const urlImagenFinal = (
         url_imagen && url_imagen !== 'undefined' && url_imagen !== ''
             ? url_imagen
-            : req.file?.path || req.file?.secure_url || null
+            : archivoSubido?.path || archivoSubido?.secure_url || null
     );
 
     try {
